@@ -10,10 +10,9 @@ import {
   XCircle,
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
-import { t } from '@/lib/translations';
 
 const Dashboard = ({ onFileSelect }) => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -28,14 +27,14 @@ const Dashboard = ({ onFileSelect }) => {
         <div className="flex items-center gap-3">
           <Shield className="w-8 h-8 text-primary" />
           <div>
-            <div className="text-white font-bold text-lg">{t(language, 'app_name')}</div>
-            <div className="text-neutral-300 text-xs">{t(language, 'tagline')}</div>
+            <div className="text-white font-bold text-lg">{t('app_name')}</div>
+            <div className="text-neutral-300 text-xs">{t('tagline')}</div>
           </div>
         </div>
         <div className="flex items-center gap-4">
           <button className="flex items-center gap-2 text-neutral-300 hover:text-white">
             <BarChart3 className="w-5 h-5" />
-            <span>{t(language, 'history')}</span>
+            <span>{t('history')}</span>
           </button>
           <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">
             JD
@@ -46,19 +45,19 @@ const Dashboard = ({ onFileSelect }) => {
       <div className="max-w-5xl mx-auto p-8">
         <div className="bg-neutral-600 rounded-xl p-8 mb-8">
           <h2 className="text-white text-2xl font-bold mb-2">
-            {t(language, 'upload_video')}
+            {t('upload_video')}
           </h2>
           <p className="text-neutral-300 mb-6">
-            {t(language, 'upload_subtitle')}
+            {t('upload_subtitle')}
           </p>
 
           <label className="border-2 border-dashed border-neutral-300 rounded-xl p-16 flex flex-col items-center justify-center cursor-pointer hover:border-primary transition">
             <Upload className="w-16 h-16 text-primary mb-4" />
             <p className="text-white font-semibold mb-2">
-              {t(language, 'drop_video')}
+              {t('drop_video')}
             </p>
             <p className="text-neutral-300 text-sm">
-              {t(language, 'supported_formats')}
+              {t('supported_formats')}
             </p>
             <input
               type="file"
@@ -71,12 +70,12 @@ const Dashboard = ({ onFileSelect }) => {
 
         <div className="bg-neutral-600 rounded-xl p-8 mb-8">
           <h3 className="text-white text-xl font-bold mb-4">
-            {t(language, 'analysis_statistics')}
+            {t('analysis_statistics')}
           </h3>
           <div className="space-y-4">
             <div>
               <div className="flex justify-between text-sm mb-2">
-                <span className="text-neutral-300">{t(language, 'videos_analyzed')}</span>
+                <span className="text-neutral-300">{t('videos_analyzed')}</span>
                 <span className="text-white font-bold">127</span>
               </div>
               <div className="w-full bg-neutral-900 rounded-full h-2">
@@ -88,7 +87,7 @@ const Dashboard = ({ onFileSelect }) => {
             </div>
             <div>
               <div className="flex justify-between text-sm mb-2">
-                <span className="text-neutral-300">{t(language, 'detection_accuracy')}</span>
+                <span className="text-neutral-300">{t('detection_accuracy')}</span>
                 <span className="text-success font-bold">99.2%</span>
               </div>
               <div className="w-full bg-neutral-900 rounded-full h-2">
@@ -102,7 +101,7 @@ const Dashboard = ({ onFileSelect }) => {
         </div>
 
         <div className="bg-neutral-600 rounded-xl p-8">
-          <h3 className="text-white text-xl font-bold mb-4">{t(language, 'recent_scans')}</h3>
+          <h3 className="text-white text-xl font-bold mb-4">{t('recent_scans')}</h3>
           <div className="space-y-3">
             {[
               {

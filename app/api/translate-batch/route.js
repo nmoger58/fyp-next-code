@@ -14,22 +14,8 @@ export async function POST(request) {
       );
     }
 
-    // Language code mapping for LibreTranslate
-    const languageCodeMap = {
-      en: 'en',
-      es: 'es',
-      fr: 'fr',
-      de: 'de',
-      hi: 'hi',
-      ta: 'ta',
-      zh: 'zh',
-      ja: 'ja',
-    };
-
-    const targetLang = languageCodeMap[targetLanguage] || 'en';
-
     // Skip translation for English
-    if (targetLang === 'en') {
+    if (targetLanguage === 'en') {
       return Response.json({
         success: true,
         originals: texts,
@@ -38,23 +24,33 @@ export async function POST(request) {
       });
     }
 
-    // Translate all texts
-    const translatedTexts = await Promise.all(
-      texts.map(async (text) => {
-        try {
-          const response = await axios.post('https://libretranslate.com/translate', {
-            q: text,
-            source: 'en',
-            target: targetLang,
-            format: 'text',
-          });
-          return response.data.translatedText;
-        } catch (error) {
-          console.error(`Failed to translate "${text}":`, error.message);
-          return text; // Return original text on error
-        }
-      })
-    );
+    let translatedTexts = [];
+    
+    try {
+      // Free Google Translate API endpoint (undocumented)
+      // We process translations in parallel but not combined, to avoid delimiter issues
+      translatedTexts = await Promise.all(
+        texts.map(async (text) => {
+          if (!text) return '';
+          
+          const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=' + 
+            targetLanguage + '&dt=t&q=' + encodeURIComponent(text);
+            
+          const response = await axios.get(url);
+          
+          // The response format is deeply nested arrays: [[[ "translated", "original", ... ]]]
+          if (response.data && response.data[0]) {
+            // Concatenate all parts if the text was split into sentences
+            return response.data[0].map(part => part[0]).join('');
+          }
+          return text;
+        })
+      );
+    } catch (error) {
+      console.error('Google Translate API error:', error.message);
+      // Fallback to original texts on error
+      translatedTexts = texts;
+    }
 
     return Response.json({
       success: true,

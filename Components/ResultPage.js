@@ -8,10 +8,9 @@ import {
   Upload,
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
-import { t } from '@/lib/translations';
 
 const ResultPage = ({ file, analysisResult, onNewAnalysis, onDownload }) => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
 
   if (!analysisResult) {
     return null;
@@ -29,17 +28,17 @@ const ResultPage = ({ file, analysisResult, onNewAnalysis, onDownload }) => {
 
     if (isDeepfake) {
       return [
-        t(language, 'indicator_frame_inconsistencies'),
-        t(language, 'indicator_eye_movements'),
-        t(language, 'indicator_audio_mismatch'),
-        t(language, 'indicator_facial_manipulation'),
+        t('indicator_frame_inconsistencies'),
+        t('indicator_eye_movements'),
+        t('indicator_audio_mismatch'),
+        t('indicator_facial_manipulation'),
       ];
     } else {
       return [
-        t(language, 'indicator_natural_movements'),
-        t(language, 'indicator_consistent_lighting'),
-        t(language, 'indicator_no_artifacts'),
-        t(language, 'indicator_audio_sync'),
+        t('indicator_natural_movements'),
+        t('indicator_consistent_lighting'),
+        t('indicator_no_artifacts'),
+        t('indicator_audio_sync'),
       ];
     }
   };
@@ -48,7 +47,7 @@ const ResultPage = ({ file, analysisResult, onNewAnalysis, onDownload }) => {
     <div className="min-h-screen bg-neutral-900 flex items-center justify-center p-4">
       <div className="w-full max-w-3xl">
         <div className="flex justify-between items-start mb-8">
-          <h2 className="text-white text-3xl font-bold">{t(language, 'analysis_complete')}</h2>
+          <h2 className="text-white text-3xl font-bold">{t('analysis_complete')}</h2>
           <button
             onClick={onNewAnalysis}
             className="text-danger hover:text-red-400"
@@ -81,7 +80,7 @@ const ResultPage = ({ file, analysisResult, onNewAnalysis, onDownload }) => {
               <XCircle className="w-12 h-12 text-warning" />
               <div>
                 <h3 className="text-white text-2xl font-bold">
-                  {t(language, 'analysis_failed')}
+                  {t('analysis_failed')}
                 </h3>
               </div>
             </div>
@@ -94,10 +93,10 @@ const ResultPage = ({ file, analysisResult, onNewAnalysis, onDownload }) => {
               )}
               <div>
                 <h3 className="text-white text-2xl font-bold">
-                  {isDeepfake ? t(language, 'deepfake_detected') : t(language, 'authentic_video')}
+                  {isDeepfake ? t('deepfake_detected') : t('authentic_video')}
                 </h3>
                 <p className="text-neutral-300">
-                  {t(language, 'confidence')}: {confidence}%
+                  {t('confidence')}: {confidence}%
                 </p>
               </div>
             </div>
@@ -116,7 +115,7 @@ const ResultPage = ({ file, analysisResult, onNewAnalysis, onDownload }) => {
 
           <div>
             <h4 className="text-white font-bold mb-3">
-              {analysisResult.error ? t(language, 'error_details') : t(language, 'key_indicators')}
+              {analysisResult.error ? t('error_details') : t('key_indicators')}
             </h4>
             <ul className="space-y-2">
               {getIndicators().map((indicator, idx) => (
@@ -142,13 +141,13 @@ const ResultPage = ({ file, analysisResult, onNewAnalysis, onDownload }) => {
             <div className="mt-6 pt-6 border-t border-neutral-600">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <div className="text-neutral-300">{t(language, 'label')}</div>
+                  <div className="text-neutral-300">{t('label')}</div>
                   <div className="text-white font-bold">
                     {analysisResult.prediction.label}
                   </div>
                 </div>
                 <div>
-                  <div className="text-neutral-300">{t(language, 'raw_score')}</div>
+                  <div className="text-neutral-300">{t('raw_score')}</div>
                   <div className="text-white font-bold">
                     {(analysisResult.prediction.raw_score * 100).toFixed(2)}%
                   </div>
@@ -164,14 +163,14 @@ const ResultPage = ({ file, analysisResult, onNewAnalysis, onDownload }) => {
             className="bg-neutral-600 text-white py-4 rounded-lg font-semibold hover:bg-opacity-80 transition flex items-center justify-center gap-2"
           >
             <Download className="w-5 h-5" />
-            {t(language, 'download_report')}
+            {t('download_report')}
           </button>
           <button
             onClick={onNewAnalysis}
             className="bg-primary text-white py-4 rounded-lg font-semibold hover:bg-opacity-90 transition flex items-center justify-center gap-2"
           >
             <Upload className="w-5 h-5" />
-            {t(language, 'new_analysis')}
+            {t('new_analysis')}
           </button>
         </div>
       </div>

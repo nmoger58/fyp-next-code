@@ -10,13 +10,12 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
-import { t } from '@/lib/translations';
 
 const AuthPage = ({
   onLogin,
   onSignupSuccess,
 }) => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [authMode, setAuthMode] = useState('login');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -41,7 +40,7 @@ const AuthPage = ({
     ) {
       onLogin();
     } else {
-      alert(t(language, 'invalid_credentials'));
+      alert(t('invalid_credentials'));
     }
   };
 
@@ -49,9 +48,9 @@ const AuthPage = ({
     e.preventDefault();
     if (signupData.password === signupData.confirmPassword) {
       setAuthMode('login');
-      alert(t(language, 'account_created'));
+      alert(t('account_created'));
     } else {
-      alert(t(language, 'passwords_mismatch'));
+      alert(t('passwords_mismatch'));
     }
   };
 
@@ -60,7 +59,7 @@ const AuthPage = ({
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Shield className="w-16 h-16 text-primary mx-auto mb-4" />
-          <h1 className="text-3xl font-bold text-white">{t(language, 'app_name')}</h1>
+          <h1 className="text-3xl font-bold text-white">{t('app_name')}</h1>
         </div>
 
         <div className="flex gap-2 mb-8">
@@ -72,7 +71,7 @@ const AuthPage = ({
                 : 'bg-neutral-600 text-neutral-300'
             }`}
           >
-            {t(language, 'login')}
+            {t('login')}
           </button>
           <button
             onClick={() => setAuthMode('signup')}
@@ -82,23 +81,23 @@ const AuthPage = ({
                 : 'bg-neutral-600 text-neutral-300'
             }`}
           >
-            {t(language, 'signup')}
+            {t('signup')}
           </button>
         </div>
 
         {authMode === 'login' ? (
           <div>
-            <h2 className="text-2xl font-bold text-white mb-6">{t(language, 'welcome_back')}</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">{t('welcome_back')}</h2>
             <form onSubmit={handleLogin}>
               <div className="mb-4">
                 <label className="text-neutral-300 text-sm mb-2 block">
-                  {t(language, 'email_address')}
+                  {t('email_address')}
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-300" />
                   <input
                     type="text"
-                    placeholder={t(language, 'email_placeholder')}
+                    placeholder={t('email_placeholder')}
                     value={loginData.email}
                     onChange={(e) =>
                       setLoginData({ ...loginData, email: e.target.value })
@@ -110,13 +109,13 @@ const AuthPage = ({
 
               <div className="mb-4">
                 <label className="text-neutral-300 text-sm mb-2 block">
-                  {t(language, 'password')}
+                  {t('password')}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-300" />
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    placeholder={t(language, 'password_placeholder')}
+                    placeholder={t('password_placeholder')}
                     value={loginData.password}
                     onChange={(e) =>
                       setLoginData({ ...loginData, password: e.target.value })
@@ -145,10 +144,10 @@ const AuthPage = ({
                     onChange={(e) => setRememberMe(e.target.checked)}
                     className="w-4 h-4"
                   />
-                  <span className="text-sm">{t(language, 'remember_me')}</span>
+                  <span className="text-sm">{t('remember_me')}</span>
                 </label>
                 <button type="button" className="text-sm text-primary hover:underline">
-                  {t(language, 'forgot_password')}
+                  {t('forgot_password')}
                 </button>
               </div>
 
@@ -156,34 +155,34 @@ const AuthPage = ({
                 type="submit"
                 className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 transition flex items-center justify-center gap-2"
               >
-                {t(language, 'sign_in')} <ArrowRight className="w-5 h-5" />
+                {t('sign_in')} <ArrowRight className="w-5 h-5" />
               </button>
 
               <p className="text-center text-neutral-300 text-sm mt-4">
-                {t(language, 'no_account')}{' '}
+                {t('no_account')}{' '}
                 <button
                   type="button"
                   onClick={() => setAuthMode('signup')}
                   className="text-primary hover:underline"
                 >
-                  {t(language, 'signup')}
+                  {t('signup')}
                 </button>
               </p>
             </form>
           </div>
         ) : (
           <div>
-            <h2 className="text-2xl font-bold text-white mb-6">{t(language, 'create_account')}</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">{t('create_account')}</h2>
             <form onSubmit={handleSignup}>
               <div className="mb-4">
                 <label className="text-neutral-300 text-sm mb-2 block">
-                  {t(language, 'full_name')}
+                  {t('full_name')}
                 </label>
                 <div className="relative">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-300" />
                   <input
                     type="text"
-                    placeholder={t(language, 'full_name_placeholder')}
+                    placeholder={t('full_name_placeholder')}
                     value={signupData.fullName}
                     onChange={(e) =>
                       setSignupData({
@@ -198,13 +197,13 @@ const AuthPage = ({
 
               <div className="mb-4">
                 <label className="text-neutral-300 text-sm mb-2 block">
-                  {t(language, 'email_address')}
+                  {t('email_address')}
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-300" />
                   <input
                     type="email"
-                    placeholder={t(language, 'email_placeholder')}
+                    placeholder={t('email_placeholder')}
                     value={signupData.email}
                     onChange={(e) =>
                       setSignupData({ ...signupData, email: e.target.value })
@@ -216,13 +215,13 @@ const AuthPage = ({
 
               <div className="mb-4">
                 <label className="text-neutral-300 text-sm mb-2 block">
-                  {t(language, 'password')}
+                  {t('password')}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-300" />
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    placeholder={t(language, 'password_placeholder')}
+                    placeholder={t('password_placeholder')}
                     value={signupData.password}
                     onChange={(e) =>
                       setSignupData({
@@ -248,13 +247,13 @@ const AuthPage = ({
 
               <div className="mb-6">
                 <label className="text-neutral-300 text-sm mb-2 block">
-                  {t(language, 'confirm_password')}
+                  {t('confirm_password')}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-300" />
                   <input
                     type="password"
-                    placeholder={t(language, 'password_placeholder')}
+                    placeholder={t('password_placeholder')}
                     value={signupData.confirmPassword}
                     onChange={(e) =>
                       setSignupData({
@@ -271,17 +270,17 @@ const AuthPage = ({
                 type="submit"
                 className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 transition flex items-center justify-center gap-2"
               >
-                {t(language, 'create_account_btn')} <ArrowRight className="w-5 h-5" />
+                {t('create_account_btn')} <ArrowRight className="w-5 h-5" />
               </button>
 
               <p className="text-center text-neutral-300 text-sm mt-4">
-                {t(language, 'have_account')}{' '}
+                {t('have_account')}{' '}
                 <button
                   type="button"
                   onClick={() => setAuthMode('login')}
                   className="text-primary hover:underline"
                 >
-                  {t(language, 'login')}
+                  {t('login')}
                 </button>
               </p>
             </form>

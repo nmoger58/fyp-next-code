@@ -144,7 +144,7 @@ Raw Score: ${(analysisResult?.prediction?.raw_score * 100).toFixed(2)}%`
         .border-neutral-300 { border-color: var(--neutral-300); }
       `}</style>
       
-      <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 100 }}>
+      <div style={{ position: 'absolute', top: '20px', right: '180px', zIndex: 100 }}>
         <LanguageSelector />
       </div>
       

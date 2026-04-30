@@ -2,16 +2,15 @@
 import React from 'react';
 import { FileVideo, XCircle } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
-import { t } from '@/lib/translations';
 
 const ReadyPage = ({ file, onStartAnalysis, onCancel, isLoading }) => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
 
   return (
     <div className="min-h-screen bg-neutral-900 flex items-center justify-center p-4">
       <div className="w-full max-w-3xl bg-neutral-600 rounded-xl p-8">
         <div className="flex justify-between items-start mb-8">
-          <h2 className="text-white text-2xl font-bold">{t(language, 'ready_to_analyze')}</h2>
+          <h2 className="text-white text-2xl font-bold">{t('ready_to_analyze')}</h2>
           <button
             onClick={onCancel}
             className="text-danger hover:text-red-400"
@@ -28,7 +27,7 @@ const ReadyPage = ({ file, onStartAnalysis, onCancel, isLoading }) => {
           <div>
             <div className="text-white font-semibold text-lg">{file.name}</div>
             <div className="text-neutral-300 text-sm">
-              {t(language, 'file_size')}: {(file.size / (1024 * 1024)).toFixed(2)} MB
+              {t('file_size')}: {(file.size / (1024 * 1024)).toFixed(2)} MB
             </div>
           </div>
         </div>
@@ -41,12 +40,12 @@ const ReadyPage = ({ file, onStartAnalysis, onCancel, isLoading }) => {
           {isLoading ? (
             <>
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              {t(language, 'analyzing_video')}
+              {t('analyzing_video')}
             </>
           ) : (
             <>
               <FileVideo className="w-6 h-6" />
-              {t(language, 'start_analysis')}
+              {t('start_analysis')}
             </>
           )}
         </button>

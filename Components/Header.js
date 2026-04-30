@@ -4,7 +4,6 @@ import React from 'react';
 import Link from 'next/link';
 import LanguageSelector from './LanguageSelector';
 import { useLanguage } from '@/context/LanguageContext';
-import { t } from '@/lib/translations';
 
 const Header = (props) => {
   const { language } = useLanguage();

@@ -1,4 +1,4 @@
-// API route for translating text using LibreTranslate (free)
+// API route for translating text using free Google Translate API
 // This runs on the server, not in the browser
 
 import axios from 'axios';
@@ -14,22 +14,8 @@ export async function POST(request) {
       );
     }
 
-    // Language code mapping for LibreTranslate
-    const languageCodeMap = {
-      en: 'en',
-      es: 'es',
-      fr: 'fr',
-      de: 'de',
-      hi: 'hi',
-      ta: 'ta',
-      zh: 'zh',
-      ja: 'ja',
-    };
-
-    const targetLang = languageCodeMap[targetLanguage] || 'en';
-
     // Skip translation for English
-    if (targetLang === 'en') {
+    if (targetLanguage === 'en') {
       return Response.json({
         success: true,
         original: text,
@@ -38,14 +24,15 @@ export async function POST(request) {
       });
     }
 
-    const response = await axios.post('https://libretranslate.com/translate', {
-      q: text,
-      source: 'en',
-      target: targetLang,
-      format: 'text',
-    });
+    const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=' + 
+      targetLanguage + '&dt=t&q=' + encodeURIComponent(text);
 
-    const translatedText = response.data.translatedText;
+    const response = await axios.get(url);
+
+    let translatedText = text;
+    if (response.data && response.data[0]) {
+      translatedText = response.data[0].map(part => part[0]).join('');
+    }
 
     return Response.json({
       success: true,
