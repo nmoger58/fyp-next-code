@@ -12,8 +12,23 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
-const Dashboard = ({ onFileSelect, onLogout }) => {
+const Dashboard = ({ onFileSelect, onLogout, user }) => {
   const { language, t } = useLanguage();
+  const recentScansRef = React.useRef(null);
+
+  const getInitials = (name) => {
+    if (!name) return 'U';
+    // Split by space, dot or @ to handle emails or full names
+    const parts = name.split(/[\s.@]/).filter(Boolean);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+
+  const scrollToHistory = () => {
+    recentScansRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -33,12 +48,18 @@ const Dashboard = ({ onFileSelect, onLogout }) => {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <button className="flex items-center gap-2 text-neutral-300 hover:text-white">
+          <button 
+            onClick={scrollToHistory}
+            className="flex items-center gap-2 text-neutral-300 hover:text-white transition"
+          >
             <BarChart3 className="w-5 h-5" />
             <span>{t('history')}</span>
           </button>
-          <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">
-            JD
+          <div 
+            title={user?.username || user?.email || 'User'}
+            className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold cursor-default"
+          >
+            {getInitials(user?.username || user?.email || user?.full_name)}
           </div>
           <button
             onClick={onLogout}
@@ -108,7 +129,7 @@ const Dashboard = ({ onFileSelect, onLogout }) => {
           </div>
         </div>
 
-        <div className="bg-neutral-600 rounded-xl p-8">
+        <div ref={recentScansRef} className="bg-neutral-600 rounded-xl p-8">
           <h3 className="text-white text-xl font-bold mb-4">{t('recent_scans')}</h3>
           <div className="space-y-3">
             {[

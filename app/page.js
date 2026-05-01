@@ -15,13 +15,25 @@ const PageContent = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
   const [error, setError] = useState(null);
+  const [user, setUser] = useState(null);
 
   // Restore session from stored token on mount
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      setCurrentPage('dashboard');
-    }
+    const restoreSession = async () => {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        try {
+          const userData = await apiService.getCurrentUser();
+          setUser(userData);
+          setCurrentPage('dashboard');
+        } catch (err) {
+          console.error('Session restoration failed:', err);
+          localStorage.removeItem('access_token');
+          setCurrentPage('landing');
+        }
+      }
+    };
+    restoreSession();
   }, []);
 
   // Check backend health on mount
@@ -40,12 +52,20 @@ const PageContent = () => {
     setCurrentPage('auth');
   };
 
-  const handleLogin = () => {
-    setCurrentPage('dashboard');
+  const handleLogin = async () => {
+    try {
+      const userData = await apiService.getCurrentUser();
+      setUser(userData);
+    } catch (err) {
+      console.error('Error fetching user info after login:', err);
+    } finally {
+      setCurrentPage('dashboard');
+    }
   };
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
+    setUser(null);
     setUploadedFile(null);
     setAnalysisResult(null);
     setError(null);
@@ -165,7 +185,7 @@ Raw Score: ${(analysisResult?.prediction?.raw_score * 100).toFixed(2)}%`
 
       {currentPage === 'landing' && <LandingPage onGetStarted={handleGetStarted} />}
       {currentPage === 'auth' && <AuthPage onLogin={handleLogin} onSignupSuccess={() => { }} />}
-      {currentPage === 'dashboard' && <Dashboard onFileSelect={handleFileSelect} onLogout={handleLogout} />}
+      {currentPage === 'dashboard' && <Dashboard onFileSelect={handleFileSelect} onLogout={handleLogout} user={user} />}
       {currentPage === 'ready' && (
         <ReadyPage
           file={uploadedFile}
