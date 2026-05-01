@@ -8,10 +8,11 @@ import {
   FileVideo,
   CheckCircle,
   XCircle,
+  LogOut,
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
-const Dashboard = ({ onFileSelect }) => {
+const Dashboard = ({ onFileSelect, onLogout }) => {
   const { language, t } = useLanguage();
 
   const handleFileUpload = (e) => {
@@ -39,6 +40,13 @@ const Dashboard = ({ onFileSelect }) => {
           <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">
             JD
           </div>
+          <button
+            onClick={onLogout}
+            title="Logout"
+            className="flex items-center gap-2 text-neutral-300 hover:text-white transition"
+          >
+            <LogOut className="w-5 h-5" />
+          </button>
         </div>
       </nav>
 

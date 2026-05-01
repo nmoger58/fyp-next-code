@@ -10,6 +10,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { apiService } from '@/lib/api';
 
 const AuthPage = ({
   onLogin,
@@ -32,25 +33,50 @@ const AuthPage = ({
     confirmPassword: '',
   });
 
-  const handleLogin = (e) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (
-      loginData.email === 'nmoger58' &&
-      loginData.password === 'Nagu@123'
-    ) {
-      onLogin();
-    } else {
-      alert(t('invalid_credentials'));
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await apiService.login(loginData.email, loginData.password);
+      if (data.access_token) {
+        localStorage.setItem('access_token', data.access_token);
+        onLogin();
+      }
+    } catch (err) {
+      setError(err.message || t('invalid_credentials'));
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-    if (signupData.password === signupData.confirmPassword) {
+    setIsLoading(true);
+    setError(null);
+    
+    if (signupData.password !== signupData.confirmPassword) {
+      setError(t('passwords_mismatch'));
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      await apiService.signup({
+        username: signupData.email,
+        password: signupData.password,
+        // Optionally pass fullName if backend supports it
+        // full_name: signupData.fullName 
+      });
       setAuthMode('login');
       alert(t('account_created'));
-    } else {
-      alert(t('passwords_mismatch'));
+    } catch (err) {
+      setError(err.message || 'Signup failed. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -65,21 +91,19 @@ const AuthPage = ({
         <div className="flex gap-2 mb-8">
           <button
             onClick={() => setAuthMode('login')}
-            className={`flex-1 py-3 rounded-lg font-semibold transition ${
-              authMode === 'login'
+            className={`flex-1 py-3 rounded-lg font-semibold transition ${authMode === 'login'
                 ? 'bg-primary text-white'
                 : 'bg-neutral-600 text-neutral-300'
-            }`}
+              }`}
           >
             {t('login')}
           </button>
           <button
             onClick={() => setAuthMode('signup')}
-            className={`flex-1 py-3 rounded-lg font-semibold transition ${
-              authMode === 'signup'
+            className={`flex-1 py-3 rounded-lg font-semibold transition ${authMode === 'signup'
                 ? 'bg-primary text-white'
                 : 'bg-neutral-600 text-neutral-300'
-            }`}
+              }`}
           >
             {t('signup')}
           </button>
@@ -88,6 +112,11 @@ const AuthPage = ({
         {authMode === 'login' ? (
           <div>
             <h2 className="text-2xl font-bold text-white mb-6">{t('welcome_back')}</h2>
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/50 text-red-500 px-4 py-3 rounded-lg mb-6 text-sm">
+                {error}
+              </div>
+            )}
             <form onSubmit={handleLogin}>
               <div className="mb-4">
                 <label className="text-neutral-300 text-sm mb-2 block">
@@ -135,27 +164,13 @@ const AuthPage = ({
                   </button>
                 </div>
               </div>
-
-              <div className="flex items-center justify-between mb-6">
-                <label className="flex items-center gap-2 text-neutral-300 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4"
-                  />
-                  <span className="text-sm">{t('remember_me')}</span>
-                </label>
-                <button type="button" className="text-sm text-primary hover:underline">
-                  {t('forgot_password')}
-                </button>
-              </div>
-
+              
               <button
                 type="submit"
-                className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 transition flex items-center justify-center gap-2"
+                disabled={isLoading}
+                className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 transition flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                {t('sign_in')} <ArrowRight className="w-5 h-5" />
+                {isLoading ? 'Loading...' : t('sign_in')} <ArrowRight className="w-5 h-5" />
               </button>
 
               <p className="text-center text-neutral-300 text-sm mt-4">
@@ -173,6 +188,11 @@ const AuthPage = ({
         ) : (
           <div>
             <h2 className="text-2xl font-bold text-white mb-6">{t('create_account')}</h2>
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/50 text-red-500 px-4 py-3 rounded-lg mb-6 text-sm">
+                {error}
+              </div>
+            )}
             <form onSubmit={handleSignup}>
               <div className="mb-4">
                 <label className="text-neutral-300 text-sm mb-2 block">
@@ -268,9 +288,10 @@ const AuthPage = ({
 
               <button
                 type="submit"
-                className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 transition flex items-center justify-center gap-2"
+                disabled={isLoading}
+                className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 transition flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                {t('create_account_btn')} <ArrowRight className="w-5 h-5" />
+                {isLoading ? 'Loading...' : t('create_account_btn')} <ArrowRight className="w-5 h-5" />
               </button>
 
               <p className="text-center text-neutral-300 text-sm mt-4">

@@ -16,6 +16,14 @@ const PageContent = () => {
   const [analysisResult, setAnalysisResult] = useState(null);
   const [error, setError] = useState(null);
 
+  // Restore session from stored token on mount
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      setCurrentPage('dashboard');
+    }
+  }, []);
+
   // Check backend health on mount
   useEffect(() => {
     const checkBackendHealth = async () => {
@@ -34,6 +42,14 @@ const PageContent = () => {
 
   const handleLogin = () => {
     setCurrentPage('dashboard');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    setUploadedFile(null);
+    setAnalysisResult(null);
+    setError(null);
+    setCurrentPage('landing');
   };
 
   const handleFileSelect = (file) => {
@@ -86,15 +102,14 @@ Timestamp: ${new Date().toLocaleString()}
 
 ANALYSIS RESULTS
 ================
-${
-  analysisResult?.error
-    ? `Error: ${analysisResult.error}`
-    : `Status: ${analysisResult?.status}
+${analysisResult?.error
+        ? `Error: ${analysisResult.error}`
+        : `Status: ${analysisResult?.status}
 Label: ${analysisResult?.prediction?.label}
 Confidence: ${(analysisResult?.prediction?.confidence * 100).toFixed(2)}%
 Is Deepfake: ${analysisResult?.prediction?.is_deepfake ? 'Yes' : 'No'}
 Raw Score: ${(analysisResult?.prediction?.raw_score * 100).toFixed(2)}%`
-}
+      }
     `;
 
     const blob = new Blob([report], { type: 'text/plain' });
@@ -143,14 +158,14 @@ Raw Score: ${(analysisResult?.prediction?.raw_score * 100).toFixed(2)}%`
         .border-neutral-600 { border-color: var(--neutral-600); }
         .border-neutral-300 { border-color: var(--neutral-300); }
       `}</style>
-      
+
       <div style={{ position: 'absolute', top: '20px', right: '180px', zIndex: 100 }}>
         <LanguageSelector />
       </div>
-      
+
       {currentPage === 'landing' && <LandingPage onGetStarted={handleGetStarted} />}
-      {currentPage === 'auth' && <AuthPage onLogin={handleLogin} onSignupSuccess={() => {}} />}
-      {currentPage === 'dashboard' && <Dashboard onFileSelect={handleFileSelect} />}
+      {currentPage === 'auth' && <AuthPage onLogin={handleLogin} onSignupSuccess={() => { }} />}
+      {currentPage === 'dashboard' && <Dashboard onFileSelect={handleFileSelect} onLogout={handleLogout} />}
       {currentPage === 'ready' && (
         <ReadyPage
           file={uploadedFile}
