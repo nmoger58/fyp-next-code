@@ -1,7 +1,5 @@
 // API route for batch translating multiple texts
-// This runs on the server, not in the browser
-
-import axios from 'axios';
+// Uses the official Google Cloud Translation REST API — runs on server only
 
 export async function POST(request) {
   try {
@@ -24,33 +22,41 @@ export async function POST(request) {
       });
     }
 
-    let translatedTexts = [];
-    
-    try {
-      // Free Google Translate API endpoint (undocumented)
-      // We process translations in parallel but not combined, to avoid delimiter issues
-      translatedTexts = await Promise.all(
-        texts.map(async (text) => {
-          if (!text) return '';
-          
-          const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=' + 
-            targetLanguage + '&dt=t&q=' + encodeURIComponent(text);
-            
-          const response = await axios.get(url);
-          
-          // The response format is deeply nested arrays: [[[ "translated", "original", ... ]]]
-          if (response.data && response.data[0]) {
-            // Concatenate all parts if the text was split into sentences
-            return response.data[0].map(part => part[0]).join('');
-          }
-          return text;
-        })
+    const apiKey = process.env.GOOGLE_TRANSLATE_API_KEY;
+    if (!apiKey) {
+      console.error('GOOGLE_TRANSLATE_API_KEY is not set');
+      return Response.json(
+        { error: 'Translation service not configured. Please add GOOGLE_TRANSLATE_API_KEY to .env.local' },
+        { status: 500 }
       );
-    } catch (error) {
-      console.error('Google Translate API error:', error.message);
-      // Fallback to original texts on error
-      translatedTexts = texts;
     }
+
+    // Build URL with multiple 'q' params — Google accepts arrays this way
+    const params = new URLSearchParams();
+    params.append('key', apiKey);
+    params.append('target', targetLanguage);
+    params.append('source', 'en');
+    params.append('format', 'text');
+    texts.forEach((text) => params.append('q', text || ''));
+
+    const url = `https://translation.googleapis.com/language/translate/v2?${params.toString()}`;
+
+    const googleResponse = await fetch(url, { method: 'GET' });
+
+    if (!googleResponse.ok) {
+      const errData = await googleResponse.json();
+      const errMsg = errData?.error?.message || 'Google Translate API error';
+      console.error('Google Translate batch API error:', errMsg);
+      return Response.json({ error: errMsg }, { status: googleResponse.status });
+    }
+
+    const data = await googleResponse.json();
+    const translations = data?.data?.translations || [];
+
+    // Map results back — preserve order, fall back to original on missing entry
+    const translatedTexts = texts.map(
+      (original, i) => translations[i]?.translatedText || original
+    );
 
     return Response.json({
       success: true,
@@ -59,7 +65,7 @@ export async function POST(request) {
       language: targetLanguage,
     });
   } catch (error) {
-    console.error('Batch translation error:', error);
+    console.error('Batch translation error:', error.message);
     return Response.json(
       { error: error.message || 'Batch translation failed' },
       { status: 500 }
