@@ -23,12 +23,21 @@ const PageContent = () => {
       const token = localStorage.getItem('access_token');
       if (token) {
         try {
+          // Fast path: use cached user_info if available
+          const cachedUser = localStorage.getItem('user_info');
+          if (cachedUser) {
+            setUser(JSON.parse(cachedUser));
+            setCurrentPage('dashboard');
+          }
+          // Always verify token with backend in background
           const userData = await apiService.getCurrentUser();
           setUser(userData);
+          localStorage.setItem('user_info', JSON.stringify(userData));
           setCurrentPage('dashboard');
         } catch (err) {
           console.error('Session restoration failed:', err);
           localStorage.removeItem('access_token');
+          localStorage.removeItem('user_info');
           setCurrentPage('landing');
         }
       }
@@ -54,8 +63,15 @@ const PageContent = () => {
 
   const handleLogin = async () => {
     try {
-      const userData = await apiService.getCurrentUser();
-      setUser(userData);
+      // user_info was already stored by AuthPage on successful login
+      const cachedUser = localStorage.getItem('user_info');
+      if (cachedUser) {
+        setUser(JSON.parse(cachedUser));
+      } else {
+        const userData = await apiService.getCurrentUser();
+        setUser(userData);
+        localStorage.setItem('user_info', JSON.stringify(userData));
+      }
     } catch (err) {
       console.error('Error fetching user info after login:', err);
     } finally {
@@ -65,6 +81,7 @@ const PageContent = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
+    localStorage.removeItem('user_info');
     setUser(null);
     setUploadedFile(null);
     setAnalysisResult(null);

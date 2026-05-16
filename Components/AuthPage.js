@@ -44,6 +44,12 @@ const AuthPage = ({
       const data = await apiService.login(loginData.email, loginData.password);
       if (data.access_token) {
         localStorage.setItem('access_token', data.access_token);
+        // Store basic user info so Dashboard can show it immediately
+        localStorage.setItem('user_info', JSON.stringify({
+          username: data.username,
+          full_name: data.full_name || '',
+          role: data.role,
+        }));
         onLogin();
       }
     } catch (err) {
@@ -57,7 +63,7 @@ const AuthPage = ({
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-    
+
     if (signupData.password !== signupData.confirmPassword) {
       setError(t('passwords_mismatch'));
       setIsLoading(false);
@@ -65,14 +71,25 @@ const AuthPage = ({
     }
 
     try {
-      await apiService.signup({
+      const data = await apiService.signup({
         username: signupData.email,
         password: signupData.password,
-        // Optionally pass fullName if backend supports it
-        // full_name: signupData.fullName 
+        full_name: signupData.fullName,
       });
-      setAuthMode('login');
-      alert(t('account_created'));
+      // Auto-login after successful signup
+      if (data.access_token) {
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('user_info', JSON.stringify({
+          username: data.username,
+          full_name: data.full_name || signupData.fullName || '',
+          role: data.role,
+        }));
+        onLogin();
+      } else {
+        // Fallback: go to login page
+        setAuthMode('login');
+        alert(t('account_created'));
+      }
     } catch (err) {
       setError(err.message || 'Signup failed. Please try again.');
     } finally {
